@@ -1,27 +1,28 @@
-from colorama import  init
 from datetime import datetime
+from colorama import init
 import sys
 
 init()
 
 class Logger:
     def __init__(self, prefix: str = None, indent: int = 0):
-        self.WHITE: str = "\u001b[37m"
-        self.MAGENTA: str = "\x1b[38;2;157;38;255m"
-        self.RED: str = "\x1b[38;5;196m"
-        self.GREEN: str = "\x1b[38;5;40m"
-        self.YELLOW: str = "\x1b[38;5;220m"
-        self.BLUE: str = "\x1b[38;5;21m"
-        self.LIGHTBLUE: str = "\x1b[94m"
-        self.PINK: str = "\x1b[38;5;176m"
-        self.GRAY: str = "\x1b[90m"
-        self.CYAN: str = "\x1b[96m"
-        self.prefix: str = f"{self.GRAY}[{self.MAGENTA}{prefix}{self.GRAY}] {self.WHITE}| " if prefix else ""
+        self.colors = {
+            'white': "\u001b[37m",
+            'magenta': "\x1b[38;2;157;38;255m",
+            'red': "\x1b[38;5;196m",
+            'green': "\x1b[38;5;40m",
+            'yellow': "\x1b[38;5;220m",
+            'blue': "\x1b[38;5;21m",
+            'lightblue': "\x1b[94m",
+            'pink': "\x1b[38;5;176m",
+            'gray': "\x1b[90m",
+            'cyan': "\x1b[96m"
+        }
+        self.prefix: str = f"{self.colors['gray']}[{self.colors['magenta']}{prefix}{self.colors['gray']}] {self.colors['white']}| " if prefix else ""
         self.indent: str = " " * indent
         self.debug_mode: bool = any(arg.lower() in ['--debug', '-debug'] for arg in sys.argv)
 
-    @staticmethod
-    def get_time() -> str:
+    def get_time(self) -> str:
         return datetime.now().strftime("%H:%M:%S")
 
     def get_taken(self, start: float = None, end: float = None) -> str:
@@ -33,38 +34,36 @@ class Logger:
                 f"{str(duration)[:4]}s"
         return ""
 
-    def message(self, level: str, message: str, start: int = None, end: int = None) -> str:
-        time_now = f"{self.GRAY}[{self.MAGENTA}{self.get_time()}{self.GRAY}] {self.WHITE}|"
+    def _log(self, color: str, message: str, level: str, start: int = None, end: int = None) -> None:
+        time_now = f"{self.colors['gray']}[{self.colors['magenta']}{self.get_time()}{self.colors['gray']}] {self.colors['white']}|"
         taken = self.get_taken(start, end)
-        timer = f" {self.MAGENTA}In{self.WHITE} -> {self.MAGENTA}{taken}" if taken else ""
-        return f"{self.indent}{self.prefix}{time_now} {self.GRAY}[{level}{self.GRAY}] {self.WHITE}-> {self.GRAY}[{message}{self.GRAY}]{timer}"
+        timer = f" {self.colors['magenta']}In{self.colors['white']} -> {self.colors['magenta']}{taken}" if taken else ""
+        print(f"{self.indent}{self.prefix}{time_now} {self.colors['gray']}[{color}{level}{self.colors['gray']}] {self.colors['white']}-> {self.colors['gray']}[{color}{message}{self.colors['gray']}]{timer}")
 
     def success(self, message: str, level: str = "SCC", start: int = None, end: int = None) -> None:
-        print(self.message(f"{self.GREEN}{level}", f"{self.GREEN}{message}", start, end))
+        self._log(self.colors['green'], message, level, start, end)
 
     def warning(self, message: str, level: str = "WRN", start: int = None, end: int = None) -> None:
-        print(self.message(f"{self.YELLOW}{level}", f"{self.YELLOW}{message}", start, end))
+        self._log(self.colors['yellow'], message, level, start, end)
 
     def info(self, message: str, level: str = "INF", start: int = None, end: int = None) -> None:
-        print(self.message(f"{self.LIGHTBLUE}{level}", f"{self.LIGHTBLUE}{message}", start, end))
+        self._log(self.colors['lightblue'], message, level, start, end)
 
     def failure(self, message: str, level: str = "ERR", start: int = None, end: int = None) -> None:
-        print(self.message(f"{self.RED}{level}", f"{self.RED}{message}", start, end))
+        self._log(self.colors['red'], message, level, start, end)
 
     def debug(self, message: str, level: str = "DBG", start: int = None, end: int = None) -> None:
-        if self.debug_mode:
-            print(self.message(f"{self.MAGENTA}{level}", f"{self.MAGENTA}{message}", start, end))
+        if self.debug_mode: self._log(self.colors['magenta'], message, level, start, end)
 
     def captcha(self, message: str, level: str = "CAP", start: int = None, end: int = None) -> None:
-        print(self.message(f"{self.CYAN}{level}", f"{self.CYAN}{message}", start, end))
+        self._log(self.colors['cyan'], message, level, start, end)
 
     def PETC(self):
-        input(f"{self.indent}{self.GRAY}[{self.MAGENTA}Press Enter To Continue{self.GRAY}]")
+        input(f"{self.indent}{self.colors['gray']}[{self.colors['magenta']}Press Enter To Continue{self.colors['gray']}]")
 
     def __getattr__(self, name):
-        if name.upper() in self.__dict__:
+        if name.upper() in self.colors:
             def color(message: str, level: str = name.capitalize(), start: int = None, end: int = None):
-                color_code = getattr(self, name.upper())
-                print(self.message(f"{color_code}{level}", f"{color_code}{message}", start, end))
+                self._log(self.colors[name.upper()], message, level, start, end)
             return color
         raise AttributeError(f"'{self.__class__.__name__}' object has no attr '{name}'")
