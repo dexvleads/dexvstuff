@@ -1,4 +1,4 @@
-# Dexv-Stuff
+# [Dexv-Stuff](https://pypi.org/project/dexvstuff/)
 
 Stuff i use in my projects
 
