@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="dexvstuff",
-    version="1.0.0",
+    version="0.0.1",
     author="Dexv",
     author_email="dexv@dexv.lol",
     description="Stuff i use in my projects",
