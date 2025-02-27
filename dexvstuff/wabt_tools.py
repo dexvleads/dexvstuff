@@ -1,11 +1,11 @@
-import os, zipfile, requests, subprocess
+import os, tarfile, requests, subprocess
 from pathlib import Path
+from io import BytesIO
 
 class Wabt:
     def __init__(self):
         self.path = Path(os.getenv('LOCALAPPDATA')) / 'wabt'
-        if not self.is_installed():
-            self.install_wabt()
+        if not self.is_installed(): self.install_wabt()
         self.exes = self.get_exes()
     
     def is_installed(self):
@@ -15,14 +15,12 @@ class Wabt:
         return any(self.path.iterdir())
     
     def install_wabt(self):
-        zip_path = self.path / 'wabt.zip'
-        with open(zip_path, 'wb') as f:
-            f.write(requests.get("https://dexv.online/content/cdn/pyRQTdQDSgGB.zip").content)
-        
-        with zipfile.ZipFile(zip_path, 'r') as z:
-            z.extractall(self.path)
-        
-        zip_path.unlink()
+        response = requests.get("https://github.com/WebAssembly/wabt/releases/download/1.0.36/wabt-1.0.36-windows.tar.gz")
+        with tarfile.open(fileobj=BytesIO(response.content), mode='r:gz') as tar:
+            for member in tar.getmembers():
+                if member.name.startswith('wabt-1.0.36/bin/') and member.isfile():
+                    member.name = Path(member.name).name
+                    tar.extract(member, path=self.path)
     
     def get_exes(self):
         return {exe.stem.replace('-', '_'): exe for exe in self.path.glob("*.exe")}
