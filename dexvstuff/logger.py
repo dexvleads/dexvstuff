@@ -29,9 +29,9 @@ class Logger:
         if start is not None and end is not None:
             if start > 1e12: start, end = start/1000, end/1000
             duration = abs(end - start)
-            return f"{duration * 1000000:.2f}µs" if duration < 0.001 else \
-                f"{duration * 1000:.2f}ms" if duration < 1 else \
-                f"{duration:.4f}s"
+            return f"{duration * 1e6:.2f}".rstrip('0').rstrip('.') + "µs" if duration < 0.001 else \
+                f"{duration * 1e3:.2f}".rstrip('0').rstrip('.') + "ms" if duration < 1 else \
+                f"{duration:.2f}".rstrip('0').rstrip('.') + "s"
         return ""
 
     def _log(self, color: str, message: str, level: str, start: int = None, end: int = None) -> None:
