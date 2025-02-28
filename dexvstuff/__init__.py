@@ -11,7 +11,7 @@ from .jsdomruntime import JsdomRuntime
 from .files import Files
 from .wabt_tools import Wabt
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 __author__ = "Dexv"
 __license__ = "MIT"
 __all__ = ['Logger', 'JsdomRuntime', 'Files', 'Wabt']

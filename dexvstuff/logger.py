@@ -28,10 +28,10 @@ class Logger:
     def get_taken(self, start: float = None, end: float = None) -> str:
         if start is not None and end is not None:
             if start > 1e12: start, end = start/1000, end/1000
-            duration = end - start
-            return f"{int(duration * 1000000)}µs" if duration < 0.001 else \
-                f"{int(duration * 1000)}ms" if duration < 1 else \
-                f"{str(duration)[:4]}s"
+            duration = abs(end - start)
+            return f"{duration * 1000000:.2f}µs" if duration < 0.001 else \
+                f"{duration * 1000:.2f}ms" if duration < 1 else \
+                f"{duration:.4f}s"
         return ""
 
     def _log(self, color: str, message: str, level: str, start: int = None, end: int = None) -> None:
