@@ -6,12 +6,12 @@
 
 """
 
-from .logger import Logger
-from .jsdomruntime import JsdomRuntime
-from .files import Files
-from .wabt_tools import Wabt
+from .logger import *
+from .jsdomruntime import *
+from .files import *
+from .wabt_tools import *
 
-__version__ = "0.0.5"
+__version__ = "0.0.6"
 __author__ = "Dexv"
 __license__ = "MIT"
 __all__ = ['Logger', 'JsdomRuntime', 'Files', 'Wabt']
